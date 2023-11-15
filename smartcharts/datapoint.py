@@ -13,14 +13,14 @@ class Value(Protocol):
     error: int | float
 
 
-@dataclass
-class Numeric(frozen=True, slots=True):
+@dataclass(frozen=True, slots=True)
+class Numeric:
     value: int | float
     error: int | float
 
 
-@dataclass
-class Percent(frozen=True, slots=True):
+@dataclass(frozen=True, slots=True)
+class Percent:
     numerator: Numeric
     denominator: Numeric
 
@@ -30,8 +30,7 @@ class Percent(frozen=True, slots=True):
 
     @property
     def error(self):
-        raise NotImplementedError("Implement error calculation for percent.")  
-
+        raise NotImplementedError("Implement error calculation for percent.")
 
 
 class DataPoint(Protocol):
@@ -45,11 +44,10 @@ class DataPoint(Protocol):
         """
         ...
 
-    def evaluate(self) -> dict[str, Value]:
+    def evaluate(self, *args, **kwargs) -> dict[str, Value]:
         """
-        This function isn't required if the data doesn't need to be called
-        beforehand, it's used if you need to query the stucture ahead of time
-        to determine what data that you need if you have to make an api call
-        to get it.
+        This function that takes args and kwargs and builds the data point.
+        These could be simple as a string to look up in a database, or a full
+        dictionary loaded with API data.
         """
         ...

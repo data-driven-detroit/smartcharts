@@ -4,10 +4,11 @@ are built within the tree.
 """
 
 from typing import Protocol
+from dataclasses import dataclass
 from enum import Enum
 from functools import reduce
 
-from smartcharts.datapoint import DataPoint
+from smartcharts.datapoint import DataPoint, Value
 
 
 class ColumnWidth(float, Enum):
@@ -24,13 +25,12 @@ class ColumnWidth(float, Enum):
     THREE_QUARTERS = 3 / 4
     FULL = 1
 
-
     def hyphenated_name(self) -> str:
         return "column-" + self.name.replace("_", "-").lower()
 
 
 class Chart(Protocol):
-    title: str
+    name: str
     identifier: str
     _width: ColumnWidth
 
@@ -46,11 +46,13 @@ class Chart(Protocol):
         ...
 
 
+@dataclass
 class Factoid(Protocol):
     """
-    These are little snippets of text with one or more embedded, calculated 
+    These are little snippets of text with one or more embedded, calculated
     values. How this works isn't quite figured out yet.
     """
+
     template: str
 
     def collect_shopping_list(self) -> set[str]:
@@ -60,10 +62,12 @@ class Factoid(Protocol):
         ...
 
 
+@dataclass
 class StatList:
     """
     On CR, this is a single value.
     """
+
     name: str
     identifier: str
     _width: ColumnWidth
@@ -72,16 +76,23 @@ class StatList:
     def collect_shopping_list(self) -> set[str]:
         return self.stat.collect_shopping_list()
 
-    def populate(self, *args, **kwargs):
+    def populate(self, *args, **kwargs) -> dict[str, dict[str, Value]]:
         return {
             "stat": self.stat.evaluate(*args, **kwargs),
         }
 
+    @property
+    def width(self) -> str:
+        """Returns the string value of the enum assigned to _width"""
+        return self._width.name
 
+
+@dataclass
 class ColumnChart:
     """
     A basic vertical bar chart.
     """
+
     name: str
     identifier: str
     _width: ColumnWidth
@@ -112,10 +123,12 @@ class ColumnChart:
         }
 
 
+@dataclass
 class DoughnutChart:
     """
     A basic pie chart with a hole in the middle.
     """
+
     name: str
     identifier: str
     _width: ColumnWidth
@@ -135,6 +148,7 @@ class DoughnutChart:
         }
 
 
+@dataclass
 class GroupedColumnChart:
     """
     A grouped version of column charts.
@@ -143,7 +157,7 @@ class GroupedColumnChart:
     name: str
     identifier: str
     _width: ColumnWidth
-    child_charts: list[ColumnChart]    
+    child_charts: list[ColumnChart]
 
     def collect_shopping_list(self) -> set[str]:
         return reduce(
@@ -163,11 +177,12 @@ class GroupedColumnChart:
         }
 
 
+@dataclass
 class LineChart:
     name: str
     identifier: str
     _width: ColumnWidth
-    points: list[DataPoint]    
+    points: list[DataPoint]
 
     def collect_shopping_list(self) -> set[str]:
         return reduce(
