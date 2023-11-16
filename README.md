@@ -2,6 +2,14 @@
 
 A library to easily structure data profiles to work with the Census Reporter charts.js.
 
+
+## Installing from github
+
+```console
+pip install git+https://github.com/data-driven-detroit/inequalitytools
+```
+
+
 ## Basic usage
 
 The first step to use the profile maker is to write your own DataPoint class that fulfill the following protocol:
