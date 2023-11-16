@@ -1,8 +1,8 @@
 # All the user needs to do is write a class following the DataPoint
 # protocol
 from dataclasses import dataclass
-import logging
-import pytest
+import logging 
+import pytest 
 
 from smartcharts.datapoint import Numeric
 from smartcharts.profile_node import Row, Section, Profile
@@ -162,9 +162,47 @@ def test_datapoint_with_init_and_populate_args(AlmostRealDataPoint):
 
 
 def test_populate_row_with_populate_args(NeedsArgDataPoint):
-    assert False
+    row = Row(
+        name="some_row",
+        children=[
+            StatList(
+                name="First Stat",
+                identifier="first_stat",
+                _width=ColumnWidth.QUARTER,
+                stat=NeedsArgDataPoint()
+            ),
+            StatList(
+                name="Second Stat",
+                identifier="second_stat",
+                _width=ColumnWidth.QUARTER,
+                stat=NeedsArgDataPoint(),
+            ),
+        ],
+    )
+
+    assert row.populate("gamma") # Basically asserting now that this doesn't break, will need more detail later
+    assert row.populate("ziti") # Basically asserting now that this doesn't break, will need more detail later
 
 
 def test_populate_row_with_init_and_populate_args(AlmostRealDataPoint):
-    assert False
+    row = Row(
+        name="some_row",
+        children=[
+            StatList(
+                name="First Stat",
+                identifier="first_stat",
+                _width=ColumnWidth.QUARTER,
+                stat=AlmostRealDataPoint("gamma")
+            ),
+            StatList(
+                name="Second Stat",
+                identifier="second_stat",
+                _width=ColumnWidth.QUARTER,
+                stat=AlmostRealDataPoint("ziti"),
+            ),
+        ],
+    )
+
+    assert row.populate("pi") # Basically asserting now that this doesn't break, will need more detail later
+    assert row.populate("xerox") # Basically asserting now that this doesn't break, will need more detail later
 
