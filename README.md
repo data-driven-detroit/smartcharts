@@ -6,7 +6,7 @@ A library to easily structure data profiles to work with the Census Reporter cha
 ## Installing from github
 
 ```console
-pip install git+https://github.com/data-driven-detroit/inequalitytools
+pip install git+https://github.com/data-driven-detroit/smartcharts
 ```
 
 
