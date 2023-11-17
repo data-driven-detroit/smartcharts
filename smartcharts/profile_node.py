@@ -21,6 +21,7 @@ class ProfileNode:
 
     def populate(self, *args, **kwargs):
         return {
+            "name": self.name,
             "children": {
                 child.name: child.populate(*args, **kwargs)
                 for child in self.children
