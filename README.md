@@ -37,6 +37,72 @@ class DataPoint(Protocol):
 
 Once you've built the custom profile you can then build out an entire profile with that DataPoint.
 
+
+```python
+
+@dataclass
+class DistrictDataPoint:
+    name: str
+    column: str
+
+    def collect_shopping_list(self, *args, **kwargs):
+        pass
+
+    def evaluate(self, council_district: str) -> dict[str, int | float]:
+        return {
+            "this": getattr(
+                District.objects.filter(district=council_district).first(), self.column
+            )
+        }
+
+@dataclass
+class CensusDataPoint:
+    name: str
+    acs_var_name: str
+
+    def collect_shopping_list(self, *args, **kwargs):
+        return {self.acs_var_name}
+
+    def evaluate(self, api_response: dict[str, float], council_district: str) -> dict[str, int | float]:
+        # This does some complicated reading of the census api_response to aggregate 
+        # tracts to the council district.
+
+
+row = Row(
+    name="General indicators",
+    children=[
+        StatList(
+            name="Population of District",
+            _width=ColumnWidth.QUARTER,
+            identifier="some_name",
+            stat=ParcelDataPoint("Total population", "population"),
+        ),
+    ],
+)
+
+
+def mock_django_view(district_name):
+    context = row.populate(district_name)
+
+    return context
+
+print(mock_django_view("district_1"))
+
+```
+
+This will return a dictionary that looks like this:
+
+
+```python
+{
+    "name": "General indicators", # Name of the row
+    "children": {
+        "Population of District": {"stat": {"this": 16000}} # StatList rendered
+    },
+}
+```
+
+
 ## Embellishments
 
 ... more to come
@@ -49,5 +115,5 @@ Once you've built the custom profile you can then build out an entire profile wi
 
 - Add metadata handling
 - Add more tests
-- Copy over and test Django template rendering
+- Test Django template rendering
 - Bring over GeoBuilder class from SDC/HIP

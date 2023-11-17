@@ -19,11 +19,16 @@ class District:
             return type(self)([self.table])
 
         def filter(self, **kwargs):
-            return type(self)([
-                row
-                for row in self.table
-                if all(getattr(row, kwarg) == val for kwarg, val in kwargs.items())
-            ])
+            return type(self)(
+                [
+                    row
+                    for row in self.table
+                    if all(
+                        getattr(row, kwarg) == val
+                        for kwarg, val in kwargs.items()
+                    )
+                ]
+            )
 
         def first(self):
             try:
@@ -31,19 +36,20 @@ class District:
             except IndexError:
                 return None
 
-        
     Row = namedtuple("Row", "district population")
 
-    objects = Objects([
-        Row("district_1", 14001),
-        Row("district_2", 15000),
-        Row("district_3", 16000),
-        Row("district_4", 17000),
-        Row("district_5", 18000),
-        Row("district_6", 19000),
-        Row("district_7", 11000),
-        Row("district_8", 11100),
-    ])
+    objects = Objects(
+        [
+            Row("district_1", 14001),
+            Row("district_2", 15000),
+            Row("district_3", 16000),
+            Row("district_4", 17000),
+            Row("district_5", 18000),
+            Row("district_6", 19000),
+            Row("district_7", 11000),
+            Row("district_8", 11100),
+        ]
+    )
 
 
 @dataclass
@@ -57,9 +63,26 @@ class ParcelDataPoint:
     def evaluate(self, council_district: str) -> dict[str, int | float]:
         return {
             "this": getattr(
-                District.objects.filter(district=council_district).first(), self.column
+                District.objects.filter(district=council_district).first(),
+                self.column,
             )
         }
+
+
+@dataclass
+class CensusDataPoint:
+    name: str
+    acs_var_name: str
+
+    def collect_shopping_list(self, *args, **kwargs):
+        return {self.acs_var_name}
+
+    def evaluate(
+        self, api_response: dict[str, float], council_district: str
+    ) -> dict[str, int | float]:
+        # This does some complicated reading of the census api_response to aggregate
+        # tracts to the council district.
+        pass
 
 
 row = Row(
@@ -69,18 +92,24 @@ row = Row(
             name="Population of District",
             _width=ColumnWidth.QUARTER,
             identifier="some_name",
-            stat=ParcelDataPoint("population", "population"),
+            stat=ParcelDataPoint("Total population", "population"),
         ),
     ],
 )
 
 
-def django_view(district_name):
+def mock_django_view(district_name):
     context = row.populate(district_name)
 
     return context
 
 
 if __name__ == "__main__":
-    print(django_view("district_1"))
-    print(django_view("district_3"))
+    print(mock_django_view("district_1"))
+    print(mock_django_view("district_3"))
+
+
+{
+    "name": "General indicators",
+    "children": {"Population of District": {"stat": {"this": 16000}}},
+}
